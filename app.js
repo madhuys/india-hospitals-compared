@@ -25,7 +25,7 @@
 
   function lineChart(host, series, xl, fmt, opts = {}) {
     host.innerHTML = "";
-    const W = 560, H = 300, L = 48, R = 92, T = 12, B = 30;
+    const W = host.clientWidth && host.clientWidth < 480 ? 420 : 560, H = W < 560 ? 280 : 300, L = 48, R = 92, T = 12, B = 30;
     const svg = el("svg", {viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": opts.label || ""}, host);
     const all = series.flatMap(s => s.values.filter(v => v != null));
     let lo = opts.min != null ? opts.min : Math.min(0, ...all), hi = niceMax(Math.max(...all) * 1.02);
@@ -45,7 +45,7 @@
       const last = pts.filter(Boolean).pop(); ends.push({co: s.co, y: last[1], x: last[0], v: s.values[s.values.length - 1]});
     });
     // direct labels with collision avoidance
-    ends.sort((a, b) => a.y - b.y); for (let i = 1; i < ends.length; i++) if (ends[i].y - ends[i - 1].y < 15) ends[i].y = ends[i - 1].y + 15;
+    ends.sort((a, b) => a.y - b.y); for (let i = 1; i < ends.length; i++) if (ends[i].y - ends[i - 1].y < 17) ends[i].y = ends[i - 1].y + 17;
     ends.forEach(e => { el("circle", {cx: e.x, cy: series.find(s => s.co === e.co).values.slice(-1)[0] != null ? y(e.v) : e.y, r: 4, fill: col(e.co), stroke: "#fff", "stroke-width": 2}, svg); const t = el("text", {x: e.x + 8, y: e.y + 4, class: "lab"}, svg); t.textContent = e.co; });
     // hover crosshair
     const cross = el("line", {y1: T, y2: H - B, stroke: "#8a7f7f", "stroke-width": 1, visibility: "hidden"}, svg);
@@ -62,7 +62,7 @@
 
   function hbar(host, items, fmt, opts = {}) {
     host.innerHTML = "";
-    const W = 560, rowH = opts.rowH || 44, T = 8, L = 128, R = 70, H = T + items.length * rowH + 6;
+    const W = host.clientWidth && host.clientWidth < 480 ? 440 : 560, rowH = opts.rowH || 44, T = 8, L = 128, R = 70, H = T + items.length * rowH + 6;
     const svg = el("svg", {viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": opts.label || ""}, host);
     const vals = items.flatMap(it => it.bars.map(b => b.v));
     const lo = Math.min(0, ...vals), hi = opts.max != null ? opts.max : Math.max(0, ...vals) * 1.05 || 1;
@@ -227,4 +227,5 @@
   govTable();
   $("method").innerHTML = `Model: hospital revenue = prior year × bed growth × occupancy change × (1 + revenue-per-bed growth); other segments grow at set rates. EV = market cap + Sep-26 net debt. Target = multiple × FY28E EBITDA less FY28E net debt. Bull case: +2 pp occupancy, +2 pp revenue-per-bed growth, +1 pp margin. Curb case: margin caps widen beyond the 137 cancer drugs, with a company-specific revenue-per-bed drag and EBITDA hit. ${D.prices_note}. Built ${D.built}.`;
   render();
+  let rzT, rzW = innerWidth; addEventListener("resize", () => { clearTimeout(rzT); rzT = setTimeout(() => { if (Math.abs(innerWidth - rzW) > 40) { rzW = innerWidth; render(); } }, 200); });
 })();
