@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>India's big four hospital chains: Apollo, Fortis, Max, Medanta</title>
+<meta name="description" content="An interactive comparison of Apollo Hospitals, Fortis Healthcare, Max Healthcare and Medanta (Global Health): track record, drug-pricing risk, expansion, a three-year forecast, valuation and governance.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <p class="kicker">Equity comparison · November 2026</p>
+    <h1>India's big four hospital chains</h1>
+    <p class="lede">Apollo, Fortis, Max and Medanta compared on their record, the drug-pricing threat, expansion plans, a three-year forecast, valuation and governance. Every figure below is recomputed in your browser from the same inputs as the Excel model, so you can change the assumptions and watch the call move.</p>
+    <div class="call" id="call" aria-live="polite"></div>
+  </div>
+</header>
+
+<nav class="bar" aria-label="Controls">
+  <div class="wrap bar-in">
+    <div class="seg" role="radiogroup" aria-label="Scenario">
+      <button role="radio" data-sc="1" aria-checked="true">Base</button>
+      <button role="radio" data-sc="2" aria-checked="false">Bull</button>
+      <button role="radio" data-sc="3" aria-checked="false">Drug-price curb</button>
+    </div>
+    <div class="links">
+      <a href="#record">Record</a><a href="#forecast">Forecast</a><a href="#drugs">Drug pricing</a><a href="#expansion">Expansion</a><a href="#governance">Governance</a><a href="#ranking">Ranking</a><a href="#files">Files</a>
+    </div>
+  </div>
+</nav>
+
+<main class="wrap">
+  <section id="tiles" class="tiles" aria-label="Price, target and upside"></section>
+
+  <section id="record">
+    <h2>Three years of growth: Medanta and Max grew fastest, Apollo and Fortis widened margins</h2>
+    <p class="note">FY23 to FY26, consolidated, ₹ crore. FY27E to FY29E is the model forecast in the scenario you pick (dashed).</p>
+    <div class="grid2">
+      <figure><figcaption>Revenue, indexed to FY23 = 100</figcaption><div class="chart" id="ch-rev"></div></figure>
+      <figure><figcaption>EBITDA margin</figcaption><div class="chart" id="ch-margin"></div></figure>
+    </div>
+    <div class="tablewrap"><table id="t-record"></table></div>
+  </section>
+
+  <section id="forecast">
+    <h2>Forecast lab</h2>
+    <p class="note">The hospital business grows as beds × occupancy × revenue per bed. Apollo also carries HealthCo (pharmacy distribution) and AHLL; Fortis carries Agilus diagnostics. The sliders add to every forecast year on top of the scenario.</p>
+    <div class="lab">
+      <div class="sliders" id="sliders"></div>
+      <div>
+        <figure><figcaption>EBITDA, ₹ crore (FY26 actual, FY27E to FY29E)</figcaption><div class="chart" id="ch-ebitda"></div></figure>
+      </div>
+    </div>
+    <div class="tablewrap"><table id="t-fc"></table></div>
+    <details><summary>Target EV/EBITDA multiples (applied to FY28E EBITDA)</summary><div class="sliders row" id="tgt"></div></details>
+  </section>
+
+  <section id="drugs">
+    <h2>Drug-pricing curbs hurt Max most, Medanta least</h2>
+    <p class="note">On 9 November 2026 the 30% cap on trade margins for 137 cancer drugs took effect. The Supreme Court reserved its order on 27 October in a petition that seeks margin limits across all drugs and devices sold in hospitals. The score weighs oncology share, government-scheme share, pharmacy distribution share, the modelled EBITDA hit and the valuation premium at risk. Higher means more exposed.</p>
+    <div class="grid2">
+      <figure><figcaption>Exposure score (0 to 1)</figcaption><div class="chart" id="ch-drug"></div></figure>
+      <figure><figcaption>Upside to target: base case against the curb case</figcaption><div class="chart" id="ch-curb"></div></figure>
+    </div>
+    <div class="tablewrap"><table id="t-drug"></table></div>
+  </section>
+
+  <section id="expansion">
+    <h2>Expansion: Apollo adds the most beds, Medanta the most efficient plan</h2>
+    <p class="note">Bed counts are not on one basis (Apollo reports census beds; Max counts total capacity). The score weights scale 30%, capex per bed 25%, speed 20%, leverage 10% and ROCE 15%.</p>
+    <div class="grid2">
+      <figure><figcaption>Expansion score (0 to 1, higher = better plan)</figcaption><div class="chart" id="ch-exp"></div></figure>
+      <div class="tablewrap"><table id="t-exp"></table></div>
+    </div>
+  </section>
+
+  <section id="governance">
+    <h2>Governance: Medanta edges ahead, Apollo trails on related-party dealings</h2>
+    <p class="note">Scores out of 5, judged from each company's FY2026 annual report. Click a cell to see the reason.</p>
+    <div class="tablewrap"><table id="t-gov" class="gov"></table></div>
+    <p class="note" id="gov-why" aria-live="polite"></p>
+  </section>
+
+  <section id="ranking">
+    <h2>The ranking: change the weights, see if the call holds</h2>
+    <div class="lab">
+      <div class="sliders" id="weights"></div>
+      <figure><figcaption>Overall score, built from five pillars (each scaled 0 to 1 across the four)</figcaption><div class="chart" id="ch-rank"></div><div class="legend" id="rank-legend"></div></figure>
+    </div>
+  </section>
+
+  <section id="files">
+    <h2>Files and method</h2>
+    <ul class="files">
+      <li><a href="files/india-hospitals-report.pdf">Full report (PDF)</a> · <a href="files/india-hospitals-report.docx">Word</a></li>
+      <li><a href="files/india-hospitals-extended.pdf">Extended summary (PDF)</a></li>
+      <li><a href="files/india-hospitals-deck.pptx">Slide deck (PowerPoint)</a></li>
+      <li><a href="files/india-hospitals-model.xlsx">Excel model with live formulas</a></li>
+    </ul>
+    <p class="note" id="method"></p>
+    <p class="note">Not investment advice. Figures come from company filings, investor presentations, earnings calls and annual reports; the forecast and scores are this model's own.</p>
+  </section>
+</main>
+<div id="tip" class="tip" role="tooltip" hidden></div>
+<script src="data.js"></script>
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
