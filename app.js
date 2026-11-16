@@ -2,7 +2,9 @@
   const D = window.HDATA, M = window.HModel, COS = M.COS;
   const NAME = {Apollo: "Apollo Hospitals", Fortis: "Fortis Healthcare", Max: "Max Healthcare", Medanta: "Medanta (Global Health)"};
   const col = co => getComputedStyle(document.documentElement).getPropertyValue("--c-" + co).trim();
-  const S = {sc: 1, dOcc: 0, dArpob: 0, dMargin: 0, curbMult: 1, tgt: {}, W: Object.assign({}, M.DEFAULT_W)};
+  const ADJ0 = {dOcc: 0, dArpob: 0, dMargin: 0, curbMult: 1};
+  const S = {sc: 1, pick: "all", adj: {}, tgt: {}, W: Object.assign({}, M.DEFAULT_W)};
+  COS.forEach(co => S.adj[co] = Object.assign({}, ADJ0));
   COS.forEach(co => S.tgt[co] = D.inputs.companies[co].target_ev_ebitda);
 
   const f0 = x => Math.round(x).toLocaleString("en-IN");
@@ -40,8 +42,9 @@
       const solid = pts.filter((p, i) => p && (opts.split == null || i <= opts.split));
       const dash = pts.filter((p, i) => p && opts.split != null && i >= opts.split);
       const d = a => a.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join("");
-      if (solid.length) el("path", {d: d(solid), fill: "none", stroke: col(s.co), "stroke-width": 2, "stroke-linejoin": "round"}, svg);
-      if (dash.length > 1) el("path", {d: d(dash), fill: "none", stroke: col(s.co), "stroke-width": 2, "stroke-dasharray": "5 4"}, svg);
+      const op = opts.focus && opts.focus !== s.co ? 0.25 : 1, sw = opts.focus === s.co ? 3 : 2;
+      if (solid.length) el("path", {d: d(solid), fill: "none", stroke: col(s.co), "stroke-width": sw, "stroke-opacity": op, "stroke-linejoin": "round"}, svg);
+      if (dash.length > 1) el("path", {d: d(dash), fill: "none", stroke: col(s.co), "stroke-width": sw, "stroke-opacity": op, "stroke-dasharray": "5 4"}, svg);
       const last = pts.filter(Boolean).pop(); ends.push({co: s.co, y: last[1], x: last[0], v: s.values[s.values.length - 1]});
     });
     // direct labels with collision avoidance
@@ -96,12 +99,34 @@
   }
   const pp = v => (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(1) + " pp";
   const sl = $("sliders");
-  const sOcc = slider(sl, "occ", "Occupancy", -5, 5, 0.5, 0, pp, "Added to every year's occupancy", v => S.dOcc = v / 100);
-  const sArp = slider(sl, "arpob", "Revenue-per-bed growth", -4, 4, 0.5, 0, pp, "Added to annual ARPOB growth", v => S.dArpob = v / 100);
-  const sMar = slider(sl, "mar", "Hospital EBITDA margin", -3, 3, 0.25, 0, pp, "Added to the hospital margin", v => S.dMargin = v / 100);
-  const sCurb = slider(sl, "curb", "Curb severity", 0, 2.5, 0.25, 1, v => v.toFixed(2) + "×", "Scales the curb-case hit; works in the Drug-price curb scenario", v => S.curbMult = v);
+  // chain picker: the sliders move one chain, or all four together
+  const pk = document.createElement("div"); pk.className = "sl pickwrap";
+  pk.innerHTML = `<label><span>Apply to</span></label><div class="seg pick" role="radiogroup" aria-label="Hospital chain">${["all", ...COS].map(c => `<button role="radio" data-co="${c}" aria-checked="${c === "all"}">${c === "all" ? "All chains" : c}</button>`).join("")}</div><small id="pick-note"></small>`;
+  sl.appendChild(pk);
+  const targets = () => S.pick === "all" ? COS : [S.pick];
+  const setAdj = (k, v) => targets().forEach(co => S.adj[co][k] = v);
+  const sOcc = slider(sl, "occ", "Occupancy", -5, 5, 0.5, 0, pp, "Added to every year's occupancy", v => setAdj("dOcc", v / 100));
+  const sArp = slider(sl, "arpob", "Revenue-per-bed growth", -4, 4, 0.5, 0, pp, "Added to annual ARPOB growth", v => setAdj("dArpob", v / 100));
+  const sMar = slider(sl, "mar", "Hospital EBITDA margin", -3, 3, 0.25, 0, pp, "Added to the hospital margin", v => setAdj("dMargin", v / 100));
+  const sCurb = slider(sl, "curb", "Curb severity", 0, 2.5, 0.25, 1, v => v.toFixed(2) + "×", "Scales the curb-case hit; works in the Drug-price curb scenario", v => setAdj("curbMult", v));
+  const SL = [[sOcc, "dOcc", 100], [sArp, "dArpob", 100], [sMar, "dMargin", 100], [sCurb, "curbMult", 1]];
+  // show the picked chain's values on the sliders (All: the shared value, or Apollo's when they differ)
+  function syncSliders() {
+    const src = S.adj[S.pick === "all" ? COS[0] : S.pick];
+    SL.forEach(([inp, k, m]) => { inp.value = +(src[k] * m).toFixed(2); inp.parentNode.querySelector("output").textContent = (k === "curbMult" ? (+inp.value).toFixed(2) + "×" : pp(+inp.value)); });
+    const changed = COS.filter(co => Object.keys(ADJ0).some(k => Math.abs(S.adj[co][k] - ADJ0[k]) > 1e-9));
+    const differ = COS.some(co => Object.keys(ADJ0).some(k => Math.abs(S.adj[co][k] - S.adj[COS[0]][k]) > 1e-9));
+    $("pick-note").textContent = S.pick === "all"
+      ? (differ ? "Chains have their own settings; moving a slider now sets all four to the same value." : "Moving a slider changes all four chains.")
+      : `Only ${NAME[S.pick]} changes.` + (changed.length ? ` Adjusted so far: ${changed.join(", ")}.` : "");
+  }
+  pk.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    S.pick = b.dataset.co; pk.querySelectorAll("button").forEach(x => x.setAttribute("aria-checked", x === b)); syncSliders(); render();
+  }));
+  SL.forEach(([inp]) => inp.addEventListener("input", syncSliders));
   const reset = document.createElement("button"); reset.className = "btn"; reset.textContent = "Reset assumptions"; sl.appendChild(reset);
-  reset.addEventListener("click", () => { [[sOcc, 0], [sArp, 0], [sMar, 0], [sCurb, 1]].forEach(([i, v]) => { i.value = v; i.dispatchEvent(new Event("input")); }); });
+  reset.addEventListener("click", () => { targets().forEach(co => S.adj[co] = Object.assign({}, ADJ0)); syncSliders(); render(); });
+  syncSliders();
   COS.forEach(co => slider($("tgt"), "t" + co, co, 15, 40, 0.5, S.tgt[co], v => v.toFixed(1) + "x", null, v => S.tgt[co] = v));
   const wl = {growth: "Earnings growth (EBITDA CAGR)", upside: "Upside to target price", expansion: "Expansion plan", drug: "Drug-pricing resilience", gov: "Governance"};
   Object.keys(wl).forEach(k => slider($("weights"), "w" + k, wl[k], 0, 50, 5, S.W[k] * 100, v => v + "%", null, v => S.W[k] = v / 100));
@@ -177,7 +202,7 @@
     ]);
 
     // forecast
-    lineChart($("ch-ebitda"), COS.map(co => ({co, values: F[co].ebitda.slice(3)})), yrs.slice(3), v => f0(v), {split: 0, label: "EBITDA forecast"});
+    lineChart($("ch-ebitda"), COS.map(co => ({co, values: F[co].ebitda.slice(3)})), yrs.slice(3), v => f0(v), {split: 0, label: "EBITDA forecast", focus: S.pick === "all" ? null : S.pick});
     table("t-fc", ["", ...H.slice(1)], [
       {sec: "Forecast, " + scName},
       ["Revenue FY29E, ₹ crore", ...COS.map(co => f0(F[co].rev[6]))],
@@ -207,7 +232,7 @@
       ["Oncology share of revenue", ...best(COS.map(co => e(co).oncology_share), v => pct(v, 0))],
       ["Government and institutional payer share", ...best(COS.map(co => e(co).institutional_share), v => pct(v, 0))],
       ["Pharmacy distribution share of revenue", ...best(COS.map(co => e(co).pharmacy_rev_share), v => pct(v, 0))],
-      ["Modelled EBITDA hit if curbs widen", ...best(COS.map(co => k(co).curb_ebitda_hit * S.curbMult), v => pct(v, 1))],
+      ["Modelled EBITDA hit if curbs widen", ...best(COS.map(co => k(co).curb_ebitda_hit * S.adj[co].curbMult), v => pct(v, 1))],
       ["Trailing P/E (premium at risk)", ...best(COS.map(co => e(co).pe_ttm), xx)],
       ["Jefferies order (1 = least affected)", ...COS.map(co => e(co).jefferies_rank)],
       ["Exposure score", ...best(COS.map(co => ds[co]), v => v.toFixed(2))],

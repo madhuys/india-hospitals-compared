@@ -105,7 +105,8 @@
     return {pillars, scaled, total, order};
   }
   function runAll(D, opts) {
-    const F = Object.fromEntries(COS.map(co => [co, forecast(D, co, opts)]));
+    // opts.adj = {co: {dOcc, dArpob, dMargin, curbMult}}: per-chain lab overrides
+    const F = Object.fromEntries(COS.map(co => [co, forecast(D, co, opts.adj && opts.adj[co] ? Object.assign({}, opts, opts.adj[co]) : opts)]));
     return F;
   }
   root.HModel = {COS, forecast, runAll, drugScore, expansionScore, govScore, ranking,
