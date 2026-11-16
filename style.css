@@ -1,9 +1,9 @@
-@font-face { font-family: "Bitter"; src: url("fonts/Bitter-Regular.ttf") format("truetype"); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: "Bitter"; src: url("fonts/Bitter-Bold.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: swap; }
-@font-face { font-family: "Bitter"; src: url("fonts/Bitter-Italic.ttf") format("truetype"); font-weight: 400; font-style: italic; font-display: swap; }
-@font-face { font-family: "IBM Plex Sans"; src: url("fonts/IBMPlexSans-Regular.ttf") format("truetype"); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: "IBM Plex Sans"; src: url("fonts/IBMPlexSans-Bold.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: swap; }
-@font-face { font-family: "IBM Plex Sans"; src: url("fonts/IBMPlexSans-Italic.ttf") format("truetype"); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: "Bitter"; src: url("fonts/Bitter-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Bitter"; src: url("fonts/Bitter-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Bitter"; src: url("fonts/Bitter-Italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: "IBM Plex Sans"; src: url("fonts/IBMPlexSans-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "IBM Plex Sans"; src: url("fonts/IBMPlexSans-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "IBM Plex Sans"; src: url("fonts/IBMPlexSans-Italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: swap; }
 :root{--bg:#F7F4F1;--surface:#ECE5E1;--card:#FFFFFF;--text:#221819;--muted:#6B5F5F;--primary:#7A1F2B;--line:#D9CFCA;--grid:#E6DEDA;
 --c-Apollo:#B23A48;--c-Fortis:#3D6FC4;--c-Max:#2E9466;--c-Medanta:#B8860B;--good:#2E7D4F;--bad:#A3242F;--radius:4px;
 --fh:"Bitter",Georgia,serif;--fb:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
