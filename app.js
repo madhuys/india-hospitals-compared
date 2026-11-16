@@ -131,8 +131,8 @@
   const wl = {growth: "Earnings growth (EBITDA CAGR)", upside: "Upside to target price", expansion: "Expansion plan", drug: "Drug-pricing resilience", gov: "Governance"};
   Object.keys(wl).forEach(k => slider($("weights"), "w" + k, wl[k], 0, 50, 5, S.W[k] * 100, v => v + "%", null, v => S.W[k] = v / 100));
 
-  document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => {
-    S.sc = +b.dataset.sc; document.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-checked", x === b)); render();
+  document.querySelectorAll(".seg button[data-sc]").forEach(b => b.addEventListener("click", () => {
+    S.sc = +b.dataset.sc; document.querySelectorAll(".seg button[data-sc]").forEach(x => x.setAttribute("aria-checked", x === b)); render();
   }));
 
   // ---------- static tables ----------
